@@ -1,11 +1,11 @@
 {
-  "name": "database",
+  "name": "mcp-database-server",
   "version": "0.1.0",
-  "description": "A Model Context Protocol server",
-  "private": true,
+  "description": "A Model Context Protocol server for database connections",
+  "private": false,
   "type": "module",
   "bin": {
-    "database": "./build/index.js"
+    "mcp-database-server": "./build/index.js"
   },
   "files": [
     "build"
@@ -14,16 +14,49 @@
     "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\"",
     "prepare": "npm run build",
     "watch": "tsc --watch",
-    "inspector": "npx @modelcontextprotocol/inspector build/index.js"
+    "inspector": "npx @modelcontextprotocol/inspector build/index.js",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
+    "test:postgres": "node --experimental-vm-modules node_modules/jest/bin/jest.js -t postgres",
+    "test:unit": "node --experimental-vm-modules node_modules/jest/bin/jest.js src/__tests__/unit",
+    "test:integration": "node --experimental-vm-modules node_modules/jest/bin/jest.js src/__tests__/integration"
   },
+  "keywords": [
+    "mcp",
+    "database",
+    "mysql",
+    "postgres",
+    "sql",
+    "model-context-protocol",
+    "claude",
+    "ai"
+  ],
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/mcp-database-server"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/mcp-database-server/issues"
+  },
+  "homepage": "https://github.com/yourusername/mcp-database-server#readme",
   "dependencies": {
     "@modelcontextprotocol/sdk": "0.6.0",
-    "mysql2": "^3.14.0",
-    "pg": "^8.14.1"
+    "dotenv": "^16.3.1",
+    "mysql2": "^3.6.5",
+    "pg": "^8.13.0"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.14",
     "@types/node": "^20.11.24",
-    "@types/pg": "^8.11.13",
+    "@types/pg": "^8.10.9",
+    "jest": "^29.7.0",
+    "jest-environment-node": "^29.7.0",
+    "ts-jest": "^29.3.2",
     "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=20.18.3"
   }
 }
