@@ -1,10 +1,11 @@
+import { EnvConfig } from "./config/env-config.js";
 import { MCPDatabaseServer } from "./server/server.js";
 
 async function main() {
   try {
     console.error("Starting Database MCP Server...");
 
-    const server = new MCPDatabaseServer();
+    const server = new MCPDatabaseServer(new EnvConfig());
     await server.start();
 
     // Keep process alive

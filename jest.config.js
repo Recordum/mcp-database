@@ -13,6 +13,6 @@ export default {
       },
     ],
   },
-  testMatch: ['**/__tests__/**/*.test.ts'],
-  testTimeout: 10000 // 10초 타임아웃
-}; 
+  testMatch: ["**/__test__/**/*.spec.ts"],
+  testTimeout: 10000, // 10초 타임아웃
+};

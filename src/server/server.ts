@@ -15,13 +15,14 @@ import {
 import { DatabaseFactory } from "../database/factory.js";
 import { ExecuteQueryArgs } from "./types/index.js";
 import dotenv from "dotenv";
+import { EnvConfig } from "../config/env-config.js";
 
 dotenv.config();
 
 export class MCPDatabaseServer {
   private mcpServer: Server;
   private drivers: Map<string, DatabaseDriver> = new Map();
-  constructor() {
+  constructor(private readonly configManger: EnvConfig) {
     this.mcpServer = new Server(
       {
         name: "database-mcp",
@@ -48,53 +49,10 @@ export class MCPDatabaseServer {
 
   private setupDriversFromEnv() {
     // 환경 변수에서 DB_ALIASES 찾기
-    const dbAliases = process.env.DB_ALIASES?.split(",");
-    console.error("DB_ALIASES: ", dbAliases);
-
-    if (!dbAliases || dbAliases.length === 0) {
-      console.error("No DB_ALIASES found in environment variables");
-      return;
-    }
-
-    for (const alias of dbAliases) {
-      const trimmedAlias = alias.trim();
-      if (!trimmedAlias) continue;
-
-      // DB_<ALIAS>_TYPE 환경 변수로 타입 결정
-      const typeEnv = process.env[`DB_${trimmedAlias.toUpperCase()}_TYPE`];
-      console.error(`Type for ${trimmedAlias}: "${typeEnv}"`);
-      console.error(`Available database types:`, Object.values(DatabaseType));
-
-      if (!typeEnv) {
-        console.error(`No database type found for alias ${trimmedAlias}`);
-        continue;
-      }
-
-      // 지원하는 타입인지 확인 - 값 비교로 수정
-      const validTypes = Object.values(DatabaseType);
-      if (!validTypes.includes(typeEnv as DatabaseType)) {
-        console.error(
-          `Unsupported database type for alias ${trimmedAlias}: ${typeEnv}`
-        );
-        continue;
-      }
-
-      try {
-        // 환경 변수에서 설정 생성
-        const type = typeEnv as DatabaseType;
-        const config = DatabaseFactory.createConfigFromEnv(type, trimmedAlias);
-
-        // 드라이버 생성
-        const driver = DatabaseFactory.createDriver(type, config);
-        this.drivers.set(trimmedAlias, driver);
-
-        console.error(`Created ${type} driver for alias ${trimmedAlias}`);
-      } catch (error) {
-        console.error(
-          `Error creating driver for alias ${trimmedAlias}:`,
-          error
-        );
-      }
+    const configs = this.configManger.getConfigs();
+    for (const config of configs) {
+      const driver = DatabaseFactory.createDriver(config);
+      this.drivers.set(config.connectionAlias, driver);
     }
   }
 

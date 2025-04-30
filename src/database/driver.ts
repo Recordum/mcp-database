@@ -31,8 +31,10 @@ export interface PostgresConfig extends BaseConfig {
 
 // 다른 DB 유형들을 위한 설정은 나중에 추가 가능
 
-// 통합 설정 타입 - 모든 데이터베이스 유형의 설정 통합
-export type DatabaseConfig = MySQLConfig | PostgresConfig;
+// 관계형 데이터베이스 설정
+export type RelationalDBConfig = MySQLConfig | PostgresConfig;
+
+export type DatabaseConfig = RelationalDBConfig;
 
 // 쿼리 결과 인터페이스
 export interface QueryResult {
