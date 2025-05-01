@@ -1,5 +1,5 @@
 {
-  "name": "mcp-database-server",
+  "name": "database-mcp-server",
   "version": "0.1.0",
   "description": "A Model Context Protocol server for database connections",
   "private": false,
@@ -11,7 +11,7 @@
     "build"
   ],
   "scripts": {
-    "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\"",
+    "build": "node ./script/build.js",
     "prepare": "npm run build",
     "watch": "tsc --watch",
     "inspector": "npx @modelcontextprotocol/inspector build/index.js",
@@ -31,16 +31,16 @@
     "claude",
     "ai"
   ],
-  "author": "Your Name <your.email@example.com>",
+  "author": "MinGyu Oh",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/mcp-database-server"
+    "url": "https://github.com/Recordum/mcp-database"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/mcp-database-server/issues"
+    "url": "https://github.com/Recordum/mcp-database/issues"
   },
-  "homepage": "https://github.com/yourusername/mcp-database-server#readme",
+  "homepage": "https://github.com/Recordum/mcp-database#readme",
   "dependencies": {
     "@modelcontextprotocol/sdk": "0.6.0",
     "dotenv": "^16.3.1",
