@@ -11,11 +11,11 @@
     "build"
   ],
   "scripts": {
-    "build": "node ./script/build.js",
+    "build": "node ./scripts/build.js",
     "prepare": "npm run build",
     "watch": "tsc --watch",
     "inspector": "npx @modelcontextprotocol/inspector build/index.js",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test": "node ./scripts/test.js",
     "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
     "test:postgres": "node --experimental-vm-modules node_modules/jest/bin/jest.js -t postgres",
     "test:unit": "node --experimental-vm-modules node_modules/jest/bin/jest.js src/__tests__/unit",

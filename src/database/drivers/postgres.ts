@@ -1,4 +1,5 @@
 import pg from "pg";
+import fs from "fs";
 import {
   DatabaseDriver,
   QueryResult,
@@ -24,9 +25,7 @@ export class PostgresDriver implements DatabaseDriver {
       database,
       connectionAlias,
       type,
-      maxConnections,
-      idleTimeoutMillis,
-      ...additionalConfig
+      ssl,
     } = config;
 
     // Pool 옵션 설정
@@ -36,12 +35,15 @@ export class PostgresDriver implements DatabaseDriver {
       user: username,
       password,
       database,
-      ...additionalConfig,
+      ssl: ssl
+        ? {
+            rejectUnauthorized: ssl.rejectUnauthorized,
+            ca: ssl.rejectUnauthorized
+              ? fs.readFileSync(ssl.ca)
+              : undefined,
+          }
+        : undefined,
     };
-
-    // 추가 Pool 옵션 설정
-    if (maxConnections) poolConfig.max = maxConnections;
-    if (idleTimeoutMillis) poolConfig.idleTimeoutMillis = idleTimeoutMillis;
 
     this.pool = new pg.Pool(poolConfig);
   }
