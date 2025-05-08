@@ -38,14 +38,17 @@ export class PostgresDriver implements DatabaseDriver {
       ssl: ssl
         ? {
             rejectUnauthorized: ssl.rejectUnauthorized,
-            ca: ssl.rejectUnauthorized
-              ? fs.readFileSync(ssl.ca)
-              : undefined,
+            ca: ssl.rejectUnauthorized ? fs.readFileSync(ssl.ca) : undefined,
           }
         : undefined,
     };
 
     this.pool = new pg.Pool(poolConfig);
+
+    // 프로세스 종료 시 풀 종료
+    process.on("SIGINT", this.cleanup.bind(this));
+    process.on("SIGTERM", this.cleanup.bind(this));
+    process.on("exit", this.cleanup.bind(this));    
   }
 
   getType(): string {
@@ -104,7 +107,16 @@ export class PostgresDriver implements DatabaseDriver {
           console.warn("Could not roll back transaction:", error)
         );
 
-      await this.disconnect();
+      await this.disconnect()
+    }
+  }
+
+  async cleanup() {
+    if (this.client) {
+      this.client.release();
+    }
+    if (this.pool) {
+      await this.pool.end();
     }
   }
 }
