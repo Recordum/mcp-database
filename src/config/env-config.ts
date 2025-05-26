@@ -1,3 +1,4 @@
+import fs from "fs";
 import {
   RelationalDBConfig,
   DatabaseType,
@@ -114,10 +115,18 @@ export class EnvConfig {
         process.env[`${prefix}SSL_REJECT_UNAUTHORIZED`] === "true";
     }
 
-    //todo 실제 CA 인증서 처리 필요
     // 설정에 SSL 추가
     if (Object.keys(ssl).length > 0) {
       config.ssl = ssl;
+    }
+
+    if (process.env[`${prefix}SSL_CA`] !== undefined) {
+      config.ssl.ca = process.env[`${prefix}SSL_CA`];
+      try {
+        fs.readFileSync(config.ssl.ca);
+      } catch (error) {
+        throw new Error(`Invalid CA file for alias ${config.connectionAlias}`);
+      }
     }
 
     return config;

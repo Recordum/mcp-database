@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  postgres-no-ssl:
+    image: postgres:15
+    ports:
+      - "5450:5432"
+    environment:
+      POSTGRES_USER: testuser
+      POSTGRES_PASSWORD: testpass
+      POSTGRES_DB: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U testuser"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  postgres-ssl:
+    image: postgres:15
+    ports:
+      - "5455:5432"
+    environment:
+      POSTGRES_USER: testuser
+      POSTGRES_PASSWORD: testpass
+      POSTGRES_DB: postgres
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+        - ./ssl/postgres/server.crt:/var/lib/postgresql/server.crt:ro
+        - ./ssl/postgres/server.key:/var/lib/postgresql/server.key:ro
+        - ./ssl/postgres/ca.crt:/var/lib/postgresql/ca.crt:ro
+        - ./ssl/postgres/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf:ro
+    command: >
+        -c ssl=on
+        -c ssl_cert_file=/var/lib/postgresql/server.crt
+        -c ssl_key_file=/var/lib/postgresql/server.key
+        -c ssl_ca_file=/var/lib/postgresql/ca.crt
+        -c hba_file=/var/lib/postgresql/data/pg_hba.conf
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U testuser"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # mysql:
+  #   image: mysql:latest
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: rootpass
+  #     MYSQL_DATABASE: testdb
+  #     MYSQL_USER: testuser
+  #     MYSQL_PASSWORD: testpass
+  #   ports:
+  #     - "3309:3306" 
+
+volumes:
+  postgres-ssl-data:

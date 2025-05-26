@@ -1,4 +1,5 @@
 import mysql from "mysql2/promise";
+import fs from "fs";
 import { DatabaseDriver, QueryResult, MySQLConfig } from "../driver.js";
 
 export class MySQLDriver implements DatabaseDriver {
@@ -19,7 +20,14 @@ export class MySQLDriver implements DatabaseDriver {
       database: config.database,
       waitForConnections: true,
       connectionLimit: config.connectionLimit || 10,
-      ...config.ssl ? { ssl: config.ssl } : {}
+      ssl: config.ssl
+        ? {
+            rejectUnauthorized: config.ssl.rejectUnauthorized,
+            ca: config.ssl.rejectUnauthorized
+              ? fs.readFileSync(config.ssl.ca)
+              : undefined,
+          }
+        : undefined,
     });
   }
 
@@ -65,7 +73,7 @@ export class MySQLDriver implements DatabaseDriver {
     } finally {
       try {
         // 항상 ROLLBACK 시도
-        await this.connection?.query('ROLLBACK');
+        await this.connection?.query("ROLLBACK");
       } catch (rollbackError) {
         console.warn("MySQL rollback failed:", rollbackError);
       }

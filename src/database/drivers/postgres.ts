@@ -1,4 +1,5 @@
 import pg from "pg";
+import fs from "fs";
 import {
   DatabaseDriver,
   QueryResult,
@@ -24,9 +25,7 @@ export class PostgresDriver implements DatabaseDriver {
       database,
       connectionAlias,
       type,
-      maxConnections,
-      idleTimeoutMillis,
-      ...additionalConfig
+      ssl,
     } = config;
 
     // Pool 옵션 설정
@@ -36,14 +35,20 @@ export class PostgresDriver implements DatabaseDriver {
       user: username,
       password,
       database,
-      ...additionalConfig,
+      ssl: ssl
+        ? {
+            rejectUnauthorized: ssl.rejectUnauthorized,
+            ca: ssl.rejectUnauthorized ? fs.readFileSync(ssl.ca) : undefined,
+          }
+        : undefined,
     };
 
-    // 추가 Pool 옵션 설정
-    if (maxConnections) poolConfig.max = maxConnections;
-    if (idleTimeoutMillis) poolConfig.idleTimeoutMillis = idleTimeoutMillis;
-
     this.pool = new pg.Pool(poolConfig);
+
+    // 프로세스 종료 시 풀 종료
+    process.on("SIGINT", this.cleanup.bind(this));
+    process.on("SIGTERM", this.cleanup.bind(this));
+    process.on("exit", this.cleanup.bind(this));    
   }
 
   getType(): string {
@@ -102,7 +107,16 @@ export class PostgresDriver implements DatabaseDriver {
           console.warn("Could not roll back transaction:", error)
         );
 
-      await this.disconnect();
+      await this.disconnect()
+    }
+  }
+
+  async cleanup() {
+    if (this.client) {
+      this.client.release();
+    }
+    if (this.pool) {
+      await this.pool.end();
     }
   }
 }
