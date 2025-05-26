@@ -60,5 +60,4 @@ export enum DatabaseType {
   // 나중에 추가할 수 있는 데이터베이스 유형들:
   // BIGQUERY = 'bigquery',
   // ATHENA = 'athena',
-  // SNOWFLAKE = 'snowflake',
 }
